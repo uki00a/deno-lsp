@@ -329,43 +329,7 @@ export class Server {
     const rootUri = new URL(params.rootUri!);
     const project = await this.registerProject(rootUri);
     await this.registerLanguageServiceForProject(project);
-    const result: InitializeResult = {
-      serverInfo: { name: "deno-lsp" },
-      capabilities: {
-        textDocumentSync: TextDocumentSyncKind.Incremental,
-        completionProvider: {
-          triggerCharacters: [".", '"', "'", "/", "@", "<"],
-          resolveProvider: true,
-        },
-        codeActionProvider: true,
-        definitionProvider: true,
-        documentFormattingProvider: true,
-        documentRangeFormattingProvider: true,
-        documentHighlightProvider: true,
-        documentSymbolProvider: true,
-        executeCommandProvider: {
-          commands: [
-            /*
-            Commands.APPLY_WORKSPACE_EDIT,
-            Commands.APPLY_CODE_ACTION,
-            Commands.APPLY_REFACTORING,
-            Commands.ORGANIZE_IMPORTS,
-            Commands.APPLY_RENAME_FILE,
-            */
-          ],
-        },
-        hoverProvider: true,
-        renameProvider: true,
-        referencesProvider: true,
-        signatureHelpProvider: {
-          triggerCharacters: ["(", ",", "<"],
-        },
-        workspaceSymbolProvider: true,
-        implementationProvider: true,
-        typeDefinitionProvider: true,
-        foldingRangeProvider: true,
-      },
-    };
+    const result = this.createInitializeResult();
     await req.respond(result);
     this.#logger.debug("Initialization succeeded!");
   }
@@ -491,5 +455,45 @@ export class Server {
     const service = this.#serviceByProject.get(project);
     assert(service, "LanguageService must be registered: " + textDocument.uri);
     return service;
+  }
+
+  private createInitializeResult(): InitializeResult {
+    return {
+      serverInfo: { name: "deno-lsp" },
+      capabilities: {
+        textDocumentSync: TextDocumentSyncKind.Incremental,
+        completionProvider: {
+          triggerCharacters: [".", '"', "'", "/", "@", "<"],
+          resolveProvider: true,
+        },
+        codeActionProvider: true,
+        definitionProvider: true,
+        documentFormattingProvider: true,
+        documentRangeFormattingProvider: true,
+        documentHighlightProvider: true,
+        documentSymbolProvider: true,
+        executeCommandProvider: {
+          commands: [
+            /*
+            Commands.APPLY_WORKSPACE_EDIT,
+            Commands.APPLY_CODE_ACTION,
+            Commands.APPLY_REFACTORING,
+            Commands.ORGANIZE_IMPORTS,
+            Commands.APPLY_RENAME_FILE,
+            */
+          ],
+        },
+        hoverProvider: true,
+        renameProvider: true,
+        referencesProvider: true,
+        signatureHelpProvider: {
+          triggerCharacters: ["(", ",", "<"],
+        },
+        workspaceSymbolProvider: true,
+        implementationProvider: true,
+        typeDefinitionProvider: true,
+        foldingRangeProvider: true,
+      },
+    };
   }
 }
