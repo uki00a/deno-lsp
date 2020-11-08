@@ -145,7 +145,7 @@ Deno.test("integration test", async () => {
           },
         },
         "rootPath": projectRoot,
-        "processId": 391727,
+        "processId": Deno.pid,
         "trace": "off",
       },
     });
