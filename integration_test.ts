@@ -23,6 +23,18 @@ async function sendMessage(
   await bufw.flush();
 }
 
+async function readResponse(r: Deno.Reader): Promise<Record<string, unknown>> {
+  const bufr = BufReader.create(r);
+  const tp = new TextProtoReader(bufr);
+  const headers = await tp.readMIMEHeader();
+  assert(headers, "Unexpected eof");
+  const contentLength = headers.get("Content-Length");
+  assert(contentLength, "Malformed response");
+  const buf = new Uint8Array(parseInt(contentLength));
+  assert(await bufr.readFull(buf), "Unexpected eof");
+  return JSON.parse(decode(buf));
+}
+
 Deno.test("integration test", async () => {
   let seqId = 0;
   const projectRoot = Deno.cwd();
@@ -35,8 +47,6 @@ Deno.test("integration test", async () => {
   const { stdin, stdout } = cli;
   assert(stdin);
   assert(stdout);
-  const bufr = BufReader.create(stdout);
-  const tp = new TextProtoReader(bufr);
 
   try {
     await sendMessage(stdin, {
@@ -150,14 +160,7 @@ Deno.test("integration test", async () => {
       },
     });
 
-    const headers = await tp.readMIMEHeader();
-    assert(headers, "Unexpected eof");
-    const contentLength = headers.get("Content-Length");
-    assert(contentLength, "Malformed response");
-    const buf = new Uint8Array(parseInt(contentLength));
-    assert(await bufr.readFull(buf), "Unexpected eof");
-    const initializeResult = JSON.parse(decode(buf));
-    console.log(initializeResult);
+    const initializeResult = await readResponse(stdout);
     assertObjectMatch(initializeResult, {
       jsonrpc: "2.0",
       id: seqId,
