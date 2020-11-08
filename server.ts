@@ -229,12 +229,14 @@ import {
 import { createLanguageService } from "./language_service.ts";
 import { collectRootFiles } from "./fs.ts";
 import { Project } from "./project.ts";
+import { Projects } from "./projects.ts";
+import { TextDocument } from "./text_document.ts";
 
 export class Server {
   #conn: Connection;
-  #serviceByRootUri = new Map<DocumentUri, LanguageService>();
-  #projectByRootUri = new Map<DocumentUri, Project>();
-  #openedTextDocumentByUri = new Map<DocumentUri, TextDocumentItem>();
+  #serviceByProject = new Map<Project, LanguageService>();
+  #projects = new Projects();
+  #openedTextDocumentByUri = new Map<DocumentUri, TextDocument>();
   #logger: Logger;
 
   #closed = false;
@@ -316,7 +318,9 @@ export class Server {
     if (params.rootUri == null) {
       // TODO
     }
-    await this.registerLanguageService(new URL(params.rootUri!));
+    const rootUri = new URL(params.rootUri!);
+    const project = await this.registerProject(rootUri);
+    await this.registerLanguageServiceForProject(project);
     const result: InitializeResult = {
       serverInfo: { name: "deno-lsp" },
       capabilities: {
@@ -358,16 +362,22 @@ export class Server {
     this.#logger.debug("Initialization succeeded!");
   }
 
-  private async registerLanguageService(documentUri: URL): Promise<void> {
-    assert(!this.#serviceByRootUri.has(documentUri.href));
-    const rootFileNames = await collectRootFiles(documentUri.pathname);
-    const project = new Project(documentUri.pathname, rootFileNames);
+  private async registerLanguageServiceForProject(
+    project: Project,
+  ): Promise<void> {
+    assert(!this.#serviceByProject.has(project));
     const languageService = await createLanguageService(
       project,
       this.#logger,
     );
-    this.#projectByRootUri.set(documentUri.href, project);
-    this.#serviceByRootUri.set(documentUri.href, languageService);
+    this.#serviceByProject.set(project, languageService);
+  }
+
+  private async registerProject(rootUri: URL): Promise<Project> {
+    const rootFileNames = await collectRootFiles(rootUri.pathname);
+    const project = new Project(rootUri.pathname, rootFileNames);
+    this.#projects.addProject(project);
+    return project;
   }
 
   private hover(req: Request): Promise<void> {
@@ -375,7 +385,7 @@ export class Server {
     const params = message.params as HoverParams;
     const textDocument = this.textDocumentForIdentifier(params.textDocument);
     const languageService = this.languageServiceForTextDocument(textDocument);
-    const position = this.computePosition(textDocument, params.position);
+    const position = textDocument.position(params.position);
     const fileName = this.fileNameOf(textDocument);
     const quickInfo = languageService.getQuickInfoAtPosition(
       fileName,
@@ -401,14 +411,15 @@ export class Server {
 
   private didOpenTextDocument(req: Request): Promise<void> {
     const message = req.message as NotificationMessage;
-    const { textDocument } = message.params as DidOpenTextDocumentParams;
+    const params = message.params as DidOpenTextDocumentParams;
 
-    if (this.#openedTextDocumentByUri.has(textDocument.uri)) {
+    if (this.#openedTextDocumentByUri.has(params.textDocument.uri)) {
       this.#logger.error(
-        "Cannot open already opened document: " + textDocument.uri,
+        "Cannot open already opened document: " + params.textDocument.uri,
       );
     } else {
-      const project = this.projectForTextDocument(textDocument);
+      const textDocument = new TextDocument(params.textDocument);
+      const project = this.#projects.findProjectByTextDocument(textDocument);
       const fileName = this.fileNameOf(textDocument);
       project.addScriptFile(fileName);
       this.#openedTextDocumentByUri.set(textDocument.uri, textDocument);
@@ -427,63 +438,24 @@ export class Server {
 
   private textDocumentForIdentifier(
     identifier: TextDocumentIdentifier,
-  ): TextDocumentItem {
+  ): TextDocument {
     const textDocument = this.#openedTextDocumentByUri.get(identifier.uri);
     assert(textDocument, "textDocument did not open: " + identifier);
     return textDocument;
   }
 
   private languageServiceForTextDocument(
-    textDocument: TextDocumentItem,
+    textDocument: TextDocument,
   ): LanguageService {
-    const service = this.lookupByTextDocument(
-      this.#serviceByRootUri,
-      textDocument,
-    );
+    const project = this.#projects.findProjectByTextDocument(textDocument);
+    const service = this.#serviceByProject.get(project);
     assert(service, "LanguageService must be registered: " + textDocument.uri);
     return service;
   }
 
-  private projectForTextDocument(
-    textDocument: TextDocumentItem,
-  ): Project {
-    const project = this.lookupByTextDocument(
-      this.#projectByRootUri,
-      textDocument,
-    );
-    assert(project, "project must be registered: " + textDocument.uri);
-    return project;
-  }
-
-  private lookupByTextDocument<T>(
-    map: Map<DocumentUri, T>,
-    textDocument: TextDocumentItem,
-  ): T | undefined {
-    for (const [rootUri, value] of map) {
-      if (textDocument.uri.startsWith(rootUri)) {
-        return value;
-      }
-    }
-    return undefined;
-  }
-
-  private computePosition(
-    textDocument: TextDocumentItem,
-    position: Position,
-  ): number {
-    let pos = 0;
-    const lines = textDocument.text.split("\n");
-    for (let i = 0; i < position.line; i++) {
-      pos += lines[i].length;
-    }
-    pos += position.character;
-    this.#logger.debug("computePosition: ", pos, position);
-    return pos;
-  }
-
-  private fileNameOf(textDocument: TextDocumentItem): string {
+  private fileNameOf(textDocument: TextDocument): string {
     const uri = new URL(textDocument.uri);
-    const project = this.projectForTextDocument(textDocument);
+    const project = this.#projects.findProjectByTextDocument(textDocument);
     return project.relativizeScriptFileName(uri.pathname);
   }
 }
