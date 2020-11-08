@@ -16,6 +16,7 @@ export type { LevelName as LogLevelName } from "https://deno.land/std@0.76.0/log
 export {
   assert,
   assertEquals,
+  assertObjectMatch,
   assertStrictEquals,
 } from "https://deno.land/std@0.76.0/testing/asserts.ts";
 export { deferred } from "https://deno.land/std@0.76.0/async/deferred.ts";
