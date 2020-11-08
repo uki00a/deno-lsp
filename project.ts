@@ -1,4 +1,4 @@
-import { assert } from "./deps.ts";
+import { assert, path } from "./deps.ts";
 
 export class Project {
   #rootPath: string;
@@ -61,5 +61,9 @@ export class Project {
       ? scriptFile.slice(this.#rootPath.length)
       : scriptFile;
     return scriptFile.startsWith("/") ? scriptFile.slice(1) : scriptFile;
+  }
+
+  resolveUri(scriptFile: string): URL {
+    return path.toFileUrl(path.join(this.#rootPath, scriptFile));
   }
 }

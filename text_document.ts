@@ -17,8 +17,16 @@ export class TextDocument {
     return this.baseTextDocument.uri;
   }
 
+  get version(): number {
+    return this.baseTextDocument.version;
+  }
+
   pathname(): string {
     return new URL(this.uri).pathname;
+  }
+
+  positionAt(offset: number): Position {
+    return this.baseTextDocument.positionAt(offset);
   }
 
   offsetAt(position: Position): number {

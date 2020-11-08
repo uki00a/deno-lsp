@@ -177,7 +177,7 @@ Deno.test(
           "method": "textDocument/hover",
           "params": {
             "textDocument": {
-              "uri": path.toFileUrl(testTSFile),
+              "uri": path.toFileUrl(testTSFile).href,
             },
             "position": { "character": 0, "line": 0 },
           },
@@ -194,6 +194,42 @@ Deno.test(
             value: "function add(a: number, b: number): number",
           },
         },
+      });
+
+      await sendMessage(stdin, {
+        "id": ++seqId,
+        "jsonrpc": "2.0",
+        "method": "textDocument/definition",
+        "params": {
+          "textDocument": {
+            "uri": path.toFileUrl(testTSFile).href,
+          },
+          "position": {
+            "line": 0,
+            "character": 1,
+          },
+        },
+      });
+
+      const definitions = await readResponse(stdout);
+      assertEquals(definitions, {
+        id: seqId,
+        jsonrpc: "2.0",
+        result: [
+          {
+            uri: path.toFileUrl(testTSFile).href,
+            range: {
+              start: {
+                line: 2,
+                character: 16,
+              },
+              end: {
+                line: 2,
+                character: 18,
+              },
+            },
+          },
+        ],
       });
     } finally {
       cli.stdin.close();

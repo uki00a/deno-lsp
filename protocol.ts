@@ -724,6 +724,29 @@ export interface TextDocumentItem {
   text: string;
 }
 
+export interface DefinitionParams
+  extends
+    TextDocumentPositionParams,
+    WorkDoneProgressParams,
+    PartialResultParams {
+}
+
+export interface PartialResultParams {
+  partialResultToken?: ProgressToken;
+}
+
+export interface Location {
+  uri: DocumentUri;
+  range: Range;
+}
+
+export interface LocationLink {
+  originSelectionRange?: Range;
+  targetUri: DocumentUri;
+  targetRange: Range;
+  targetSelectionRange: Range;
+}
+
 export function isRequestMessage(
   message: RequestMessage | NotificationMessage,
 ): message is RequestMessage {
