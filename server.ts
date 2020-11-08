@@ -208,6 +208,7 @@ import { assert, deferred, log } from "./deps.ts";
 import type { Logger } from "./logger.ts";
 import { Connection, Request } from "./connection.ts";
 import type {
+  DefinitionParams,
   DidCloseTextDocumentParams,
   DidOpenTextDocumentParams,
   DocumentUri,
@@ -215,6 +216,7 @@ import type {
   HoverParams,
   InitializeParams,
   InitializeResult,
+  Location,
   NotificationMessage,
   Position,
   RequestMessage,
@@ -300,6 +302,8 @@ export class Server {
         return this.didOpenTextDocument(req);
       case "textDocument/didClose":
         return this.didCloseTextDocument(req);
+      case "textDocument/definition":
+        return this.definition(req);
       default:
         this.#logger.warn("Unknown method: " + req.message.method);
         if (isRequestMessage(req.message)) {
@@ -391,12 +395,10 @@ export class Server {
       fileName,
       position,
     );
-    this.#logger.debug(["quickInfo: ", quickInfo]);
     if (!quickInfo || !quickInfo.displayParts) {
       const emptyHover: Hover = { contents: [] };
       return req.respond(emptyHover);
     } else {
-      assert(quickInfo.displayParts);
       const hover: Hover = {
         contents: {
           language: "typescript",
@@ -432,6 +434,42 @@ export class Server {
       this.#openedTextDocumentByUri.delete(textDocument.uri);
     }
     return Promise.resolve();
+  }
+
+  private definition(req: Request) {
+    const message = req.message as RequestMessage;
+    const params = message.params as DefinitionParams;
+    const textDocument = this.#openedTextDocumentByUri.get(
+      params.textDocument.uri,
+    );
+    assert(textDocument);
+    const project = this.#projects.findProjectByTextDocument(textDocument);
+    const service = this.#serviceByProject.get(project);
+    assert(service);
+    const definition = service.getDefinitionAtPosition(
+      project.relativizeScriptFileName(textDocument.pathname()),
+      textDocument.offsetAt(params.position),
+    );
+    if (definition == null) {
+      return req.respond(null);
+    }
+
+    const locations = definition.map((x) => {
+      const uri = project.resolveUri(x.fileName).href;
+      const referencedDocument = this.#openedTextDocumentByUri.get(uri);
+      assert(referencedDocument);
+      const location: Location = {
+        uri,
+        range: {
+          start: referencedDocument.positionAt(x.textSpan.start),
+          end: referencedDocument.positionAt(
+            x.textSpan.start + x.textSpan.length - 1,
+          ),
+        },
+      };
+      return location;
+    });
+    return req.respond(locations);
   }
 
   private textDocumentForIdentifier(
