@@ -14,7 +14,7 @@ Deno.test("Project constructor()", () => {
   assertStrictEquals(project.rootPath(), rootPath);
 });
 
-Deno.test("Project.addScriptFile", () => {
+Deno.test("Project.addScriptFile()", () => {
   const rootUri = "/home/bar/ghq/github.com/hoge/deno-lsp";
   const project = new Project(rootUri, ["a.ts", "b.ts"]);
   project.addScriptFile("c.ts");
@@ -25,4 +25,16 @@ Deno.test("Project.addScriptFile", () => {
   );
   assertStrictEquals(project.versionFor("c.ts"), 0);
   assertStrictEquals(project.versionFor("subdir/d.ts"), 0);
+});
+
+Deno.test("Project.relativizeScriptFileName()", () => {
+  const rootUri = "/home/bar/ghq/github.com/foo/deno-lsp";
+  const project = new Project(rootUri, []);
+  assertStrictEquals(
+    project.relativizeScriptFileName(
+      "/home/bar/ghq/github.com/foo/deno-lsp/subdir/add.ts",
+    ),
+    "subdir/add.ts",
+  );
+  assertStrictEquals(project.relativizeScriptFileName("a.ts"), "a.ts");
 });

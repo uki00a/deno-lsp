@@ -484,6 +484,6 @@ export class Server {
   private fileNameOf(textDocument: TextDocumentItem): string {
     const uri = new URL(textDocument.uri);
     const project = this.projectForTextDocument(textDocument);
-    return project.uriToScriptFileName(uri.pathname);
+    return project.relativizeScriptFileName(uri.pathname);
   }
 }

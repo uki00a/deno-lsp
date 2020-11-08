@@ -10,7 +10,7 @@ export class Project {
     assert(rootPath.startsWith("/"), "rootPath must start with '/'");
     this.#rootPath = rootPath;
     this.#scriptFileNames = new Set(
-      scriptFileName.map((x) => this.normalizeScriptFileName(x)),
+      scriptFileName.map((x) => this.relativizeScriptFileName(x)),
     );
     this.#scriptFileNamesAsArray = Array.from(this.#scriptFileNames);
     this.#versions = {};
@@ -28,11 +28,11 @@ export class Project {
   }
 
   versionFor(scriptFile: string): number {
-    return this.#versions[this.normalizeScriptFileName(scriptFile)].version;
+    return this.#versions[this.relativizeScriptFileName(scriptFile)].version;
   }
 
   addScriptFile(scriptFile: string): void {
-    scriptFile = this.normalizeScriptFileName(scriptFile);
+    scriptFile = this.relativizeScriptFileName(scriptFile);
     if (!this.hasScriptFile(scriptFile)) {
       this.#scriptFileNames.add(scriptFile);
       this.#scriptFileNamesAsArray.push(scriptFile);
@@ -41,7 +41,7 @@ export class Project {
   }
 
   removeScriptFile(scriptFile: string): void {
-    scriptFile = this.normalizeScriptFileName(scriptFile);
+    scriptFile = this.relativizeScriptFileName(scriptFile);
     if (this.hasScriptFile(scriptFile)) {
       this.#scriptFileNames.delete(scriptFile);
       this.#scriptFileNamesAsArray.splice(
@@ -52,15 +52,11 @@ export class Project {
   }
 
   hasScriptFile(scriptFile: string): boolean {
-    scriptFile = this.normalizeScriptFileName(scriptFile);
+    scriptFile = this.relativizeScriptFileName(scriptFile);
     return this.#scriptFileNames.has(scriptFile);
   }
 
-  uriToScriptFileName(uri: string) {
-    return this.normalizeScriptFileName(uri);
-  }
-
-  private normalizeScriptFileName(scriptFile: string): string {
+  relativizeScriptFileName(scriptFile: string): string {
     scriptFile = scriptFile.startsWith(this.#rootPath)
       ? scriptFile.slice(this.#rootPath.length)
       : scriptFile;
