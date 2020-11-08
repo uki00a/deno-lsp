@@ -261,9 +261,13 @@ export class Server {
         try {
           this.handleRequest(req);
         } catch (e) {
-          this.#logger.error(
-            e instanceof Error ? `${e.name}: ${e.message}` : e,
-          );
+          const message = e instanceof Error
+            ? `${e.name}: ${e.message}`
+            : String(e);
+          this.#logger.error(message);
+          if (isRequestMessage(req.message)) {
+            req.respondError(ErrorCodes.InternalError, message);
+          }
         }
       }
     } catch (e) {
