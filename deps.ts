@@ -1,15 +1,13 @@
 // @deno-types="https://unpkg.com/typescript@4.0.3/lib/typescript.d.ts"
 import {
-  CompilerOptions as _CompilerOptions,
-  default as _ts,
-  LanguageService as _LanguageService,
-  LanguageServiceHost as _LanguageServiceHost,
+  CompilerOptions,
+  default as ts,
+  LanguageService,
+  LanguageServiceHost,
 } from "https://jspm.dev/typescript@4.0.3/lib/typescript.js";
 
-export type LanguageServiceHost = _LanguageServiceHost;
-export type LanguageService = _LanguageService;
-export type CompilerOptions = _CompilerOptions;
-export const ts = _ts;
+export type { CompilerOptions, LanguageService, LanguageServiceHost };
+export { ts };
 
 // https://github.com/microsoft/vscode-languageserver-node/tree/0979376c8fd626c87064aca0bdd4c297340d6b9c/textDocument
 // @deno-types="https://unpkg.com/vscode-languageserver-textdocument@1.0.1/lib/esm/main.d.ts"
