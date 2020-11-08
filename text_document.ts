@@ -1,23 +1,27 @@
 import type { Position, TextDocumentItem } from "./protocol.ts";
+import { TextDocument as BaseTextDocument } from "./deps.ts";
 
+// TODO Remove this class...
 export class TextDocument {
-  constructor(private readonly textDocument: TextDocumentItem) {}
+  private readonly baseTextDocument: BaseTextDocument;
+  constructor(textDocument: TextDocumentItem) {
+    this.baseTextDocument = BaseTextDocument.create(
+      textDocument.uri,
+      textDocument.languageId,
+      textDocument.version,
+      textDocument.text,
+    );
+  }
 
   get uri(): string {
-    return this.textDocument.uri;
+    return this.baseTextDocument.uri;
   }
 
   pathname(): string {
     return new URL(this.uri).pathname;
   }
 
-  position(position: Position): number {
-    let pos = 0;
-    const lines = this.textDocument.text.split("\n");
-    for (let i = 0; i < position.line; i++) {
-      pos += lines[i].length;
-    }
-    pos += position.character;
-    return pos;
+  offsetAt(position: Position): number {
+    return this.baseTextDocument.offsetAt(position);
   }
 }

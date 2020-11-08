@@ -1,3 +1,19 @@
+import type {
+  DocumentUri,
+  Position,
+  Range,
+  TextDocumentContentChangeEvent,
+  TextEdit,
+} from "./deps.ts";
+
+export type {
+  DocumentUri,
+  Position,
+  Range,
+  TextDocumentContentChangeEvent,
+  TextEdit,
+};
+
 /**
  * @see https://www.jsonrpc.org/specification
  * @see https://github.com/tennashi/lsp_spec_ja
@@ -63,16 +79,6 @@ export const ErrorCodes = {
   RequestCancelled: -32800,
   ContentModified: -32801,
 };
-
-export interface Range {
-  readonly start: Position;
-  readonly end: Position;
-}
-
-export interface Position {
-  readonly line: number;
-  readonly character: number;
-}
 
 export interface InitializeParams {
   processId: number | null;
@@ -684,8 +690,6 @@ export interface MarkupContent {
   readonly kind: MarkupKind;
   readonly value: string;
 }
-
-export type DocumentUri = string;
 
 export interface TextDocumentIdentifier {
   uri: DocumentUri;

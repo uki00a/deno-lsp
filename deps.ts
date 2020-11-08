@@ -11,6 +11,26 @@ export type LanguageService = _LanguageService;
 export type CompilerOptions = _CompilerOptions;
 export const ts = _ts;
 
+// https://github.com/microsoft/vscode-languageserver-node/tree/0979376c8fd626c87064aca0bdd4c297340d6b9c/textDocument
+// @deno-types="https://unpkg.com/vscode-languageserver-textdocument@1.0.1/lib/esm/main.d.ts"
+import {
+  DocumentUri,
+  Position,
+  Range,
+  TextDocument,
+  TextDocumentContentChangeEvent,
+  TextEdit,
+} from "https://cdn.skypack.dev/vscode-languageserver-textdocument@1.0.1";
+
+export { TextDocument };
+export type {
+  DocumentUri,
+  Position,
+  Range,
+  TextDocumentContentChangeEvent,
+  TextEdit,
+};
+
 export * as log from "https://deno.land/std@0.76.0/log/mod.ts";
 export type { LevelName as LogLevelName } from "https://deno.land/std@0.76.0/log/mod.ts";
 export {
