@@ -1,4 +1,5 @@
 import type { Position, TextDocumentItem } from "./protocol.ts";
+
 export class TextDocument {
   constructor(private readonly textDocument: TextDocumentItem) {}
 

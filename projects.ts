@@ -19,4 +19,14 @@ export class Projects {
   addProject(project: Project): void {
     this.projects.push(project);
   }
+
+  addTextDocument(textDocument: TextDocument): void {
+    const project = this.findProjectByTextDocument(textDocument);
+    project.addScriptFile(textDocument.pathname());
+  }
+
+  fileNameOfTextDocument(textDocument: TextDocument): string {
+    const project = this.findProjectByTextDocument(textDocument);
+    return project.relativizeScriptFileName(textDocument.pathname());
+  }
 }

@@ -386,7 +386,7 @@ export class Server {
     const textDocument = this.textDocumentForIdentifier(params.textDocument);
     const languageService = this.languageServiceForTextDocument(textDocument);
     const position = textDocument.position(params.position);
-    const fileName = this.fileNameOf(textDocument);
+    const fileName = this.#projects.fileNameOfTextDocument(textDocument);
     const quickInfo = languageService.getQuickInfoAtPosition(
       fileName,
       position,
@@ -419,9 +419,7 @@ export class Server {
       );
     } else {
       const textDocument = new TextDocument(params.textDocument);
-      const project = this.#projects.findProjectByTextDocument(textDocument);
-      const fileName = this.fileNameOf(textDocument);
-      project.addScriptFile(fileName);
+      this.#projects.addTextDocument(textDocument);
       this.#openedTextDocumentByUri.set(textDocument.uri, textDocument);
     }
     return Promise.resolve();
@@ -451,11 +449,5 @@ export class Server {
     const service = this.#serviceByProject.get(project);
     assert(service, "LanguageService must be registered: " + textDocument.uri);
     return service;
-  }
-
-  private fileNameOf(textDocument: TextDocument): string {
-    const uri = new URL(textDocument.uri);
-    const project = this.#projects.findProjectByTextDocument(textDocument);
-    return project.relativizeScriptFileName(uri.pathname);
   }
 }
