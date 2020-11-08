@@ -385,7 +385,7 @@ export class Server {
     const params = message.params as HoverParams;
     const textDocument = this.textDocumentForIdentifier(params.textDocument);
     const languageService = this.languageServiceForTextDocument(textDocument);
-    const position = textDocument.position(params.position);
+    const position = textDocument.offsetAt(params.position);
     const fileName = this.#projects.fileNameOfTextDocument(textDocument);
     const quickInfo = languageService.getQuickInfoAtPosition(
       fileName,
