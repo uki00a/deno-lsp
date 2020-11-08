@@ -13,7 +13,11 @@ export const ts = _ts;
 
 export * as log from "https://deno.land/std@0.76.0/log/mod.ts";
 export type { LevelName as LogLevelName } from "https://deno.land/std@0.76.0/log/mod.ts";
-export { assert } from "https://deno.land/std@0.76.0/testing/asserts.ts";
+export {
+  assert,
+  assertEquals,
+  assertStrictEquals,
+} from "https://deno.land/std@0.76.0/testing/asserts.ts";
 export { deferred } from "https://deno.land/std@0.76.0/async/deferred.ts";
 export type { Deferred } from "https://deno.land/std@0.76.0/async/deferred.ts";
 export * as path from "https://deno.land/std@0.76.0/path/mod.ts";
