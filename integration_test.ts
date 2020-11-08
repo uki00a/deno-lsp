@@ -35,7 +35,7 @@ Deno.test(
         "jsonrpc": "2.0",
         "method": "initialize",
         "params": {
-          "rootUri": `file://${projectRoot}`,
+          "rootUri": path.toFileUrl(projectRoot).href,
           "capabilities": {
             "workspace": { "configuration": true, "applyEdit": true },
             "textDocument": {
@@ -150,6 +150,7 @@ Deno.test(
         },
       });
 
+      const testTSFile = path.join(projectRoot, "/testdata/add.ts");
       await sendMessage(
         stdin,
         {
@@ -157,11 +158,11 @@ Deno.test(
           "jsonrpc": "2.0",
           "params": {
             "textDocument": {
-              "uri": `file://${projectRoot}/testdata/add.ts`,
+              "uri": path.toFileUrl(testTSFile).href,
               "version": 1,
               "languageId": "typescript",
               "text": await Deno.readTextFile(
-                path.join(projectRoot, "testdata/add.ts"),
+                testTSFile,
               ),
             },
           },
@@ -176,7 +177,7 @@ Deno.test(
           "method": "textDocument/hover",
           "params": {
             "textDocument": {
-              "uri": `file://${projectRoot}/testdata/add.ts`,
+              "uri": path.toFileUrl(testTSFile),
             },
             "position": { "character": 0, "line": 0 },
           },
