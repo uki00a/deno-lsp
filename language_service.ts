@@ -25,8 +25,8 @@ export async function createLanguageService(
   project: Project,
   logger: Logger,
 ): Promise<LanguageService> {
-  logger.debug("Creating LanguageService for project: ", project.rootUri());
-  const tsConfig = await readTSConfig(project.rootUri());
+  logger.debug("Creating LanguageService for project: ", project.rootPath());
+  const tsConfig = await readTSConfig(project.rootPath());
   const host = createServiceHost(project, tsConfig, logger);
   const languageService = ts.createLanguageService(
     host,

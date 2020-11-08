@@ -1,11 +1,14 @@
+import { assert } from "./deps.ts";
+
 export class Project {
-  #rootUri: string;
+  #rootPath: string;
   #scriptFileNames: Set<string>;
   #scriptFileNamesAsArray: Array<string>;
   #versions: { [scriptFileName: string]: { version: number } };
 
-  constructor(rootUri: string, scriptFileName: string[]) {
-    this.#rootUri = rootUri;
+  constructor(rootPath: string, scriptFileName: string[]) {
+    assert(rootPath.startsWith("/"), "rootPath must start with '/'");
+    this.#rootPath = rootPath;
     this.#scriptFileNames = new Set(
       scriptFileName.map((x) => this.normalizeScriptFileName(x)),
     );
@@ -16,8 +19,8 @@ export class Project {
     }
   }
 
-  rootUri(): string {
-    return this.#rootUri;
+  rootPath(): string {
+    return this.#rootPath;
   }
 
   scriptFileNames(): string[] {
@@ -58,8 +61,8 @@ export class Project {
   }
 
   private normalizeScriptFileName(scriptFile: string): string {
-    scriptFile = scriptFile.startsWith(this.#rootUri)
-      ? scriptFile.slice(this.#rootUri.length)
+    scriptFile = scriptFile.startsWith(this.#rootPath)
+      ? scriptFile.slice(this.#rootPath.length)
       : scriptFile;
     return scriptFile.startsWith("/") ? scriptFile.slice(1) : scriptFile;
   }

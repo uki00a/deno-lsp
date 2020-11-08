@@ -2,14 +2,16 @@ import { assert, assertEquals, assertStrictEquals, path } from "./deps.ts";
 import { Project } from "./project.ts";
 
 Deno.test("Project constructor()", () => {
+  const rootPath = "/home/foo/ghq/github.com/bar/deno-lsp";
   const project = new Project(
-    "/home/foo/ghq/github.com/bar/deno-lsp",
+    rootPath,
     ["add.ts", "mod.ts"],
   );
   assertEquals(project.scriptFileNames(), ["add.ts", "mod.ts"]);
   assert(project.hasScriptFile("add.ts"));
   assert(project.hasScriptFile("mod.ts"));
   assert(!project.hasScriptFile("nosuchfile.ts"));
+  assertStrictEquals(project.rootPath(), rootPath);
 });
 
 Deno.test("Project.addScriptFile", () => {
