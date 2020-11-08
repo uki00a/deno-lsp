@@ -37,8 +37,8 @@ export async function readResponse(
 }
 
 export function withTimeout(
-  fn: () => Promise<void>,
   timeoutInMS: number,
+  fn: () => Promise<void>,
 ): () => Promise<void> {
   return () => {
     const timeoutPromise = deferred<void>();

@@ -9,7 +9,7 @@ import { readResponse, sendMessage, withTimeout } from "./test_utils.ts";
 
 Deno.test(
   "integration test",
-  withTimeout(async () => {
+  withTimeout(10 * 1000, async () => {
     let seqId = 0;
     const projectRoot = Deno.cwd();
     const cli = Deno.run({
@@ -199,5 +199,5 @@ Deno.test(
       cli.stdout.close();
       cli.close();
     }
-  }, 10 * 1000),
+  }),
 );
