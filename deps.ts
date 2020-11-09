@@ -29,17 +29,17 @@ export type {
   TextEdit,
 };
 
-export * as log from "https://deno.land/std@0.76.0/log/mod.ts";
-export type { LevelName as LogLevelName } from "https://deno.land/std@0.76.0/log/mod.ts";
+export * as log from "https://deno.land/std@0.77.0/log/mod.ts";
+export type { LevelName as LogLevelName } from "https://deno.land/std@0.77.0/log/mod.ts";
 export {
   assert,
   assertEquals,
   assertObjectMatch,
   assertStrictEquals,
-} from "https://deno.land/std@0.76.0/testing/asserts.ts";
-export { deferred } from "https://deno.land/std@0.76.0/async/deferred.ts";
-export type { Deferred } from "https://deno.land/std@0.76.0/async/deferred.ts";
-export * as path from "https://deno.land/std@0.76.0/path/mod.ts";
-export { BufReader, BufWriter } from "https://deno.land/std@0.76.0/io/bufio.ts";
-export { TextProtoReader } from "https://deno.land/std@0.76.0/textproto/mod.ts";
-export { decode, encode } from "https://deno.land/std@0.76.0/encoding/utf8.ts";
+} from "https://deno.land/std@0.77.0/testing/asserts.ts";
+export { deferred } from "https://deno.land/std@0.77.0/async/deferred.ts";
+export type { Deferred } from "https://deno.land/std@0.77.0/async/deferred.ts";
+export * as path from "https://deno.land/std@0.77.0/path/mod.ts";
+export { BufReader, BufWriter } from "https://deno.land/std@0.77.0/io/bufio.ts";
+export { TextProtoReader } from "https://deno.land/std@0.77.0/textproto/mod.ts";
+export { decode, encode } from "https://deno.land/std@0.77.0/encoding/utf8.ts";
