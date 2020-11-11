@@ -22,13 +22,43 @@ export type { TextDocumentContentChangeEvent };
 // https://github.com/microsoft/vscode-languageserver-node/tree/f9f928d7a2983ac134ddabe86c091912f3afdea3/types
 // @deno-types="https://unpkg.com/vscode-languageserver-types@3.15.1/lib/esm/main.d.ts"
 import {
+  CodeActionKind,
+  CompletionItemKind,
+  CompletionItemTag,
+  DiagnosticTag,
   DocumentUri,
+  Hover,
+  Location,
+  LocationLink,
+  MarkedString,
+  MarkupContent,
+  MarkupKind,
   Position,
   Range,
+  SymbolKind,
+  TextDocumentIdentifier,
+  TextDocumentItem,
   TextEdit,
 } from "https://cdn.skypack.dev/vscode-languageserver-types@3.15.1";
 
-export { Position, Range, TextEdit };
+export {
+  CodeActionKind,
+  CompletionItemKind,
+  CompletionItemTag,
+  DiagnosticTag,
+  Hover,
+  Location,
+  LocationLink,
+  MarkedString,
+  MarkupContent,
+  MarkupKind,
+  Position,
+  Range,
+  SymbolKind,
+  TextDocumentIdentifier,
+  TextDocumentItem,
+  TextEdit,
+};
 export type { DocumentUri };
 
 export * as log from "https://deno.land/std@0.77.0/log/mod.ts";
