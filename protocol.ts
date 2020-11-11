@@ -1,16 +1,41 @@
-import type {
-  DocumentUri,
+import type { DocumentUri, TextDocumentContentChangeEvent } from "./deps.ts";
+
+import {
+  CodeActionKind,
+  CompletionItemKind,
+  CompletionItemTag,
+  DiagnosticTag,
+  Hover,
+  Location,
+  LocationLink,
+  MarkedString,
+  MarkupContent,
+  MarkupKind,
   Position,
   Range,
-  TextDocumentContentChangeEvent,
+  SymbolKind,
+  TextDocumentIdentifier,
+  TextDocumentItem,
   TextEdit,
 } from "./deps.ts";
 
-export type {
-  DocumentUri,
+export type { DocumentUri, TextDocumentContentChangeEvent };
+
+export {
+  CodeActionKind,
+  CompletionItemKind,
+  CompletionItemTag,
+  Hover,
+  Location,
+  LocationLink,
+  MarkedString,
+  MarkupContent,
+  MarkupKind,
   Position,
   Range,
-  TextDocumentContentChangeEvent,
+  SymbolKind,
+  TextDocumentIdentifier,
+  TextDocumentItem,
   TextEdit,
 };
 
@@ -182,63 +207,6 @@ interface WorkspaceSymbolClientCapabilities {
   };
 }
 
-export type SymbolKind =
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9
-  | 10
-  | 11
-  | 12
-  | 13
-  | 14
-  | 15
-  | 16
-  | 17
-  | 18
-  | 19
-  | 20
-  | 21
-  | 22
-  | 23
-  | 24
-  | 25
-  | 26;
-
-export const SymbolKind = {
-  File: 1,
-  Module: 2,
-  Namespace: 3,
-  Package: 4,
-  Class: 5,
-  Method: 6,
-  Property: 7,
-  Field: 8,
-  Constructor: 9,
-  Enum: 10,
-  Interface: 11,
-  Function: 12,
-  Variable: 13,
-  Constant: 14,
-  String: 15,
-  Number: 16,
-  Boolean: 17,
-  Array: 18,
-  Object: 19,
-  Key: 20,
-  Null: 21,
-  EnumMember: 22,
-  Struct: 23,
-  Event: 24,
-  Operator: 25,
-  TypeParameter: 26,
-};
-
 export interface ExecuteCommandClientCapabilities {
   dynamicRegistration?: boolean;
 }
@@ -369,19 +337,6 @@ export interface CodeActionOptions extends WorkDoneProgressOptions {
   codeActionKinds?: CodeActionKind[];
 }
 
-export type CodeActionKind = string;
-
-export const CodeActionKind = {
-  Empty: "",
-  QuickFix: "quickfix",
-  Refactor: "refactor",
-  RefactorExtract: "refactor.extract",
-  RefactorInline: "refactor.inline",
-  RefactorRewrite: "refactor.rewrite",
-  Source: "source",
-  SourceOrganizeImports: "source.organizeImports",
-};
-
 export interface CodeLensOptions extends WorkDoneProgressOptions {
   resolveProvider?: boolean;
 }
@@ -472,66 +427,6 @@ export interface CompletionClientCapabilities {
   };
   contextSupport?: boolean;
 }
-
-export const CompletionItemKind = {
-  Text: 1,
-  Method: 2,
-  Function: 3,
-  Constructor: 4,
-  Field: 5,
-  Variable: 6,
-  Class: 7,
-  Interface: 8,
-  Module: 9,
-  Property: 10,
-  Unit: 11,
-  Value: 12,
-  Enum: 13,
-  Keyword: 14,
-  Snippet: 15,
-  Color: 16,
-  File: 17,
-  Reference: 18,
-  Folder: 19,
-  EnumMember: 20,
-  Constant: 21,
-  Struct: 22,
-  Event: 23,
-  Operator: 24,
-  TypeParameter: 25,
-};
-export type CompletionItemKind =
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9
-  | 10
-  | 11
-  | 12
-  | 13
-  | 14
-  | 15
-  | 16
-  | 17
-  | 18
-  | 19
-  | 20
-  | 21
-  | 22
-  | 23
-  | 24
-  | 25;
-
-export const CompletionItemTag = {
-  Deprecated: 1,
-};
-
-export type CompletionItemTag = 1;
 
 export interface SignatureHelpClientCapabilities {
   dynamicRegistration?: boolean;
@@ -626,13 +521,6 @@ export interface PublishDiagnosticsClientCapabilities {
   dataSupport?: boolean;
 }
 
-export const DiagnosticTag = {
-  Unnecessary: 1,
-  Deprecated: 2,
-};
-
-export type DiagnosticTag = 1 | 2;
-
 export interface FoldingRangeClientCapabilities {
   dynamicRegistration?: boolean;
   rangeLimit?: number;
@@ -675,26 +563,6 @@ export interface TextDocumentClientCapabilities {
   foldingRange?: FoldingRangeClientCapabilities;
 }
 
-export interface Hover {
-  readonly contents: MarkedString | MarkedString[] | MarkupContent;
-  readonly range?: Range;
-}
-type MarkedString = string | { language: string; value: string };
-
-export const MarkupKind = {
-  PlainText: "plaintext",
-  Markdown: "markdown",
-};
-export type MarkupKind = "plaintext" | "markdown";
-export interface MarkupContent {
-  readonly kind: MarkupKind;
-  readonly value: string;
-}
-
-export interface TextDocumentIdentifier {
-  uri: DocumentUri;
-}
-
 export interface TextDocumentPositionParams {
   textDocument: TextDocumentIdentifier;
   position: Position;
@@ -717,13 +585,6 @@ export interface DidCloseTextDocumentParams {
   textDocument: TextDocumentIdentifier;
 }
 
-export interface TextDocumentItem {
-  uri: DocumentUri;
-  languageId: string;
-  version: number;
-  text: string;
-}
-
 export interface DefinitionParams
   extends
     TextDocumentPositionParams,
@@ -733,18 +594,6 @@ export interface DefinitionParams
 
 export interface PartialResultParams {
   partialResultToken?: ProgressToken;
-}
-
-export interface Location {
-  uri: DocumentUri;
-  range: Range;
-}
-
-export interface LocationLink {
-  originSelectionRange?: Range;
-  targetUri: DocumentUri;
-  targetRange: Range;
-  targetSelectionRange: Range;
 }
 
 export function isRequestMessage(

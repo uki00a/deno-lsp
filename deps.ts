@@ -12,22 +12,54 @@ export { ts };
 // https://github.com/microsoft/vscode-languageserver-node/tree/0979376c8fd626c87064aca0bdd4c297340d6b9c/textDocument
 // @deno-types="https://unpkg.com/vscode-languageserver-textdocument@1.0.1/lib/esm/main.d.ts"
 import {
-  DocumentUri,
-  Position,
-  Range,
   TextDocument,
   TextDocumentContentChangeEvent,
-  TextEdit,
 } from "https://cdn.skypack.dev/vscode-languageserver-textdocument@1.0.1";
 
 export { TextDocument };
-export type {
+export type { TextDocumentContentChangeEvent };
+
+// https://github.com/microsoft/vscode-languageserver-node/tree/f9f928d7a2983ac134ddabe86c091912f3afdea3/types
+// @deno-types="https://unpkg.com/vscode-languageserver-types@3.15.1/lib/esm/main.d.ts"
+import {
+  CodeActionKind,
+  CompletionItemKind,
+  CompletionItemTag,
+  DiagnosticTag,
   DocumentUri,
+  Hover,
+  Location,
+  LocationLink,
+  MarkedString,
+  MarkupContent,
+  MarkupKind,
   Position,
   Range,
-  TextDocumentContentChangeEvent,
+  SymbolKind,
+  TextDocumentIdentifier,
+  TextDocumentItem,
+  TextEdit,
+} from "https://cdn.skypack.dev/vscode-languageserver-types@3.15.1";
+
+export {
+  CodeActionKind,
+  CompletionItemKind,
+  CompletionItemTag,
+  DiagnosticTag,
+  Hover,
+  Location,
+  LocationLink,
+  MarkedString,
+  MarkupContent,
+  MarkupKind,
+  Position,
+  Range,
+  SymbolKind,
+  TextDocumentIdentifier,
+  TextDocumentItem,
   TextEdit,
 };
+export type { DocumentUri };
 
 export * as log from "https://deno.land/std@0.77.0/log/mod.ts";
 export type { LevelName as LogLevelName } from "https://deno.land/std@0.77.0/log/mod.ts";
