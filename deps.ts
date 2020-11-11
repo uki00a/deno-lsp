@@ -23,11 +23,15 @@ export type { TextDocumentContentChangeEvent };
 // @deno-types="https://unpkg.com/vscode-languageserver-types@3.15.1/lib/esm/main.d.ts"
 import {
   CodeActionKind,
+  Command,
+  CompletionItem,
   CompletionItemKind,
   CompletionItemTag,
+  CompletionList,
   DiagnosticTag,
   DocumentUri,
   Hover,
+  InsertTextFormat,
   Location,
   LocationLink,
   MarkedString,
@@ -43,10 +47,14 @@ import {
 
 export {
   CodeActionKind,
+  Command,
+  CompletionItem,
   CompletionItemKind,
   CompletionItemTag,
+  CompletionList,
   DiagnosticTag,
   Hover,
+  InsertTextFormat,
   Location,
   LocationLink,
   MarkedString,

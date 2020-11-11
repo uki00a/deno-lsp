@@ -208,6 +208,8 @@ import { assert, deferred, log } from "./deps.ts";
 import type { Logger } from "./logger.ts";
 import { Connection, Request } from "./connection.ts";
 import type {
+  CompletionItem,
+  CompletionParams,
   DefinitionParams,
   DidCloseTextDocumentParams,
   DidOpenTextDocumentParams,
@@ -308,6 +310,8 @@ export class Server {
         return this.didCloseTextDocument(req);
       case "textDocument/definition":
         return this.definition(req);
+      case "textDocument/completion":
+        return this.completion(req);
       default:
         this.#logger.warn("Unknown method: " + req.message.method);
         if (isRequestMessage(req.message)) {
@@ -438,6 +442,32 @@ export class Server {
       return location;
     });
     return req.respond(locations);
+  }
+
+  private async completion(req: Request): Promise<void> {
+    const message = req.message as RequestMessage;
+    const params = message.params as CompletionParams;
+    this.#logger.debug("[completion]", message.params);
+    const textDocument = this.textDocumentForIdentifier(params.textDocument);
+    const service = this.languageServiceForTextDocument(textDocument);
+    const position = textDocument.offsetAt(params.position);
+    const completions = service.getCompletionsAtPosition(textDocument.pathname(), position, {
+      includeCompletionsForModuleExports: true,
+      includeCompletionsWithInsertText: true,
+    });
+    if (completions == null) {
+      return await req.respond([]);
+    }
+    this.#logger.info(completions);
+    const items: CompletionItem[] = completions.entries.map((entry) => {
+      const item: CompletionItem = {
+        label: entry.name,
+        sortText: entry.sortText,
+        preselect: entry.isRecommended,
+      };
+      return item;
+    });
+    await req.respond(items);
   }
 
   private textDocumentForIdentifier(
