@@ -4,17 +4,24 @@ import { createServiceHost } from "./host.ts";
 import type { Project } from "./project.ts";
 import type { Logger } from "./logger.ts";
 
+const defaultCompilerOptions: CompilerOptions = Object.freeze({
+  isolatedModules: true,
+  jsx: ts.JsxEmit.React,
+  module: ts.ModuleKind.ESNext,
+});
+
 async function readTSConfig(directory: string): Promise<CompilerOptions> {
   const tsconfigPath = path.join(directory, "tsconfig.json");
   try {
     const stat = await Deno.lstat(tsconfigPath);
     if (stat.isFile) {
-      return JSON.parse(await Deno.readTextFile(tsconfigPath));
+      const tsConfig = JSON.parse(await Deno.readTextFile(tsconfigPath));
+      return tsConfig?.compilerOptions ?? defaultCompilerOptions;
     } else {
-      return {};
+      return {} as CompilerOptions;
     }
   } catch {
-    return {};
+    return defaultCompilerOptions;
   }
 }
 

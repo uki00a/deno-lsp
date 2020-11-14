@@ -235,6 +235,7 @@ import { collectRootFiles } from "./fs.ts";
 import { Project } from "./project.ts";
 import { Projects } from "./projects.ts";
 import { TextDocument } from "./text_document.ts";
+import { asCompletionItem } from "./completion.ts";
 
 export class Server {
   #conn: Connection;
@@ -447,26 +448,30 @@ export class Server {
   private async completion(req: Request): Promise<void> {
     const message = req.message as RequestMessage;
     const params = message.params as CompletionParams;
-    this.#logger.debug("[completion]", message.params);
     const textDocument = this.textDocumentForIdentifier(params.textDocument);
     const service = this.languageServiceForTextDocument(textDocument);
     const position = textDocument.offsetAt(params.position);
-    const completions = service.getCompletionsAtPosition(textDocument.pathname(), position, {
-      includeCompletionsForModuleExports: true,
-      includeCompletionsWithInsertText: true,
-    });
+    this.#logger.debug("completionPoint: ", position);
+    const completions = service.getCompletionsAtPosition(
+      textDocument.pathname(),
+      position,
+      {
+        includeCompletionsForModuleExports: true,
+        includeCompletionsWithInsertText: true,
+      },
+    );
     if (completions == null) {
       return await req.respond([]);
     }
-    this.#logger.info(completions);
     const items: CompletionItem[] = completions.entries.map((entry) => {
-      const item: CompletionItem = {
-        label: entry.name,
-        sortText: entry.sortText,
-        preselect: entry.isRecommended,
-      };
-      return item;
+      return asCompletionItem(
+        entry,
+        textDocument.pathname(),
+        params.position,
+        textDocument,
+      );
     });
+    this.#logger.debug(items);
     await req.respond(items);
   }
 

@@ -1,5 +1,7 @@
 import { assert, path } from "./deps.ts";
 
+const INITIAL_VERSION = 0;
+
 export class Project {
   #rootPath: string;
   #scriptFileNames: Set<string>;
@@ -15,7 +17,7 @@ export class Project {
     this.#scriptFileNamesAsArray = Array.from(this.#scriptFileNames);
     this.#versions = {};
     for (const scriptFile of this.#scriptFileNames) {
-      this.#versions[scriptFile] = { version: 0 };
+      this.#versions[scriptFile] = { version: INITIAL_VERSION };
     }
   }
 
@@ -36,7 +38,7 @@ export class Project {
     if (!this.hasScriptFile(scriptFile)) {
       this.#scriptFileNames.add(scriptFile);
       this.#scriptFileNamesAsArray.push(scriptFile);
-      this.#versions[scriptFile] = { version: 0 };
+      this.#versions[scriptFile] = { version: INITIAL_VERSION };
     }
   }
 
