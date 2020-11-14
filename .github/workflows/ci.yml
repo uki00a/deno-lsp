@@ -16,8 +16,8 @@ jobs:
         deno-version: 1.5.2
     - name: Run linter & formatter
       run: |
-        deno lint --unstable
-        deno fmt --check
+        deno lint --unstable --ignore=lib
+        deno fmt --check --ignore=lib
     - name: Check cli.ts
       run: |
         deno cache cli.ts
