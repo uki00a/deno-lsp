@@ -16,11 +16,10 @@ jobs:
         deno-version: 1.5.2
     - name: Run linter & formatter
       run: |
-        deno lint --unstable
-        deno fmt --check
+        make lint
     - name: Check cli.ts
       run: |
         deno cache cli.ts
     - name: Run tests
       run: |
-        deno test -A
+        make test

@@ -2,10 +2,14 @@ import type { DocumentUri, TextDocumentContentChangeEvent } from "./deps.ts";
 
 import {
   CodeActionKind,
+  Command,
+  CompletionItem,
   CompletionItemKind,
   CompletionItemTag,
+  CompletionList,
   DiagnosticTag,
   Hover,
+  InsertTextFormat,
   Location,
   LocationLink,
   MarkedString,
@@ -23,9 +27,13 @@ export type { DocumentUri, TextDocumentContentChangeEvent };
 
 export {
   CodeActionKind,
+  Command,
+  CompletionItem,
   CompletionItemKind,
   CompletionItemTag,
+  CompletionList,
   Hover,
+  InsertTextFormat,
   Location,
   LocationLink,
   MarkedString,
@@ -595,6 +603,30 @@ export interface DefinitionParams
 export interface PartialResultParams {
   partialResultToken?: ProgressToken;
 }
+
+export interface CompletionParams
+  extends
+    TextDocumentPositionParams,
+    WorkDoneProgressParams,
+    PartialResultParams {
+  context?: CompletionContext;
+}
+
+export interface WorkDoneProgressParams {
+  workDoneToken?: ProgressToken;
+}
+
+export interface CompletionContext {
+  triggerKind: CompletionTriggerKind;
+  triggerCharacter?: string;
+}
+
+export const CompletionTriggerKind = {
+  Invoked: 1,
+  TriggerCharacter: 2,
+  TriggerForIncompleteCompletions: 3,
+};
+export type CompletionTriggerKind = 1 | 2 | 3;
 
 export function isRequestMessage(
   message: RequestMessage | NotificationMessage,

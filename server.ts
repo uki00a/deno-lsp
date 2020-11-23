@@ -208,6 +208,8 @@ import { assert, deferred, log } from "./deps.ts";
 import type { Logger } from "./logger.ts";
 import { Connection, Request } from "./connection.ts";
 import type {
+  CompletionItem,
+  CompletionParams,
   DefinitionParams,
   DidCloseTextDocumentParams,
   DidOpenTextDocumentParams,
@@ -233,6 +235,7 @@ import { collectRootFiles } from "./fs.ts";
 import { Project } from "./project.ts";
 import { Projects } from "./projects.ts";
 import { TextDocument } from "./text_document.ts";
+import { asCompletionItem } from "./completion.ts";
 
 export class Server {
   #conn: Connection;
@@ -308,6 +311,8 @@ export class Server {
         return this.didCloseTextDocument(req);
       case "textDocument/definition":
         return this.definition(req);
+      case "textDocument/completion":
+        return this.completion(req);
       default:
         this.#logger.warn("Unknown method: " + req.message.method);
         if (isRequestMessage(req.message)) {
@@ -438,6 +443,36 @@ export class Server {
       return location;
     });
     return req.respond(locations);
+  }
+
+  private async completion(req: Request): Promise<void> {
+    const message = req.message as RequestMessage;
+    const params = message.params as CompletionParams;
+    const textDocument = this.textDocumentForIdentifier(params.textDocument);
+    const service = this.languageServiceForTextDocument(textDocument);
+    const position = textDocument.offsetAt(params.position);
+    this.#logger.debug("completionPoint: ", position);
+    const completions = service.getCompletionsAtPosition(
+      textDocument.pathname(),
+      position,
+      {
+        includeCompletionsForModuleExports: true,
+        includeCompletionsWithInsertText: true,
+      },
+    );
+    if (completions == null) {
+      return await req.respond([]);
+    }
+    const items: CompletionItem[] = completions.entries.map((entry) => {
+      return asCompletionItem(
+        entry,
+        textDocument.pathname(),
+        params.position,
+        textDocument,
+      );
+    });
+    this.#logger.debug(items);
+    await req.respond(items);
   }
 
   private textDocumentForIdentifier(
