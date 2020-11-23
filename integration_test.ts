@@ -147,30 +147,60 @@ testLSP({
       },
     );
 
-    const nextID = lsp.nextID();
-    await sendMessage(
-      lsp.stdin,
-      {
-        "id": nextID,
-        "jsonrpc": "2.0",
-        "method": "textDocument/completion",
-        "params": {
-          "textDocument": {
-            "uri": path.toFileUrl(testTSFile).href,
+    {
+      const nextID = lsp.nextID();
+      await sendMessage(
+        lsp.stdin,
+        {
+          "id": nextID,
+          "jsonrpc": "2.0",
+          "method": "textDocument/completion",
+          "params": {
+            "textDocument": {
+              "uri": path.toFileUrl(testTSFile).href,
+            },
+            "position": { "character": 6, "line": 1 },
           },
-          "position": { "character": 6, "line": 1 },
         },
-      },
-    );
+      );
 
-    const response = await readResponse(lsp.stdout);
-    assertObjectMatch(response, {
-      jsonrpc: "2.0",
-      id: nextID,
-    });
-    const items = response.result as CompletionItem[];
-    const item = items.find((x) => x.label === "version");
-    assert(item);
-    assertStrictEquals(item.kind, CompletionItemKind.Constant);
+      const response = await readResponse(lsp.stdout);
+      assertObjectMatch(response, {
+        jsonrpc: "2.0",
+        id: nextID,
+      });
+      const items = response.result as CompletionItem[];
+      const item = items.find((x) => x.label === "version");
+      assert(item);
+      assertStrictEquals(item.kind, CompletionItemKind.Constant);
+    }
+
+    {
+      const nextID = lsp.nextID();
+      await sendMessage(
+        lsp.stdin,
+        {
+          "id": nextID,
+          "jsonrpc": "2.0",
+          "method": "textDocument/completion",
+          "params": {
+            "textDocument": {
+              "uri": path.toFileUrl(testTSFile).href,
+            },
+            "position": { "character": 11, "line": 2 },
+          },
+        },
+      );
+
+      const response = await readResponse(lsp.stdout);
+      assertObjectMatch(response, {
+        jsonrpc: "2.0",
+        id: nextID,
+      });
+      const items = response.result as CompletionItem[];
+      const item = items.find((x) => x.label === "fetch");
+      assert(item);
+      assertStrictEquals(item.kind, CompletionItemKind.Function);
+    }
   },
 });
